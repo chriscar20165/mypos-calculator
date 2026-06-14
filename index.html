@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyPOS savings calculator</title>
+<title>myPOS savings calculator</title>
 <style>
   :root {
     --bg: #f5f4f0;
@@ -12,13 +12,7 @@
     --border-strong: #c9c5ba;
     --text: #1f1e1c;
     --text-secondary: #6b6862;
-    --info-bg: #e6f1fb;
-    --info-text: #0c447c;
-    --info-border: #85b7eb;
-    --success-bg: #eaf3de;
-    --success-text: #27500a;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --text-tertiary: #9a968d;
   }
   * { box-sizing: border-box; }
   body {
@@ -30,23 +24,37 @@
     line-height: 1.5;
   }
   .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
-  h1 { font-size: 20px; font-weight: 500; margin: 0 0 0.25rem; }
-  .subtitle { font-size: 13px; color: var(--text-secondary); margin: 0 0 0.5rem; }
-  h3 { font-size: 16px; font-weight: 500; margin: 0 0 12px; }
+  h3 { font-size: 16px; font-weight: 500; margin: 0 0 12px; color: #0458BD; }
   .card {
     background: var(--card-bg);
-    border-radius: var(--radius-lg);
+    border-radius: 12px;
     border: 0.5px solid var(--border);
     padding: 1rem 1.25rem;
   }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .header-banner {
+    background: linear-gradient(135deg, #0071F3 0%, #0458BD 100%);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .header-title { font-size: 18px; font-weight: 500; color: #E6F1FB; }
+  .header-subtitle { font-size: 13px; color: #B5D4F4; margin-top: 2px; }
+  .header-badge {
+    background: #FAC775; color: #412402; font-size: 12px; font-weight: 500;
+    padding: 6px 12px; border-radius: 8px;
+  }
+  .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
   label { font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 4px; }
   input, select, textarea {
     width: 100%;
     height: 36px;
     padding: 6px 10px;
     border: 0.5px solid var(--border-strong);
-    border-radius: var(--radius-md);
+    border-radius: 8px;
     background: var(--card-bg);
     color: var(--text);
     font-size: 14px;
@@ -55,13 +63,13 @@
   textarea { height: auto; font-family: ui-monospace, monospace; font-size: 12px; resize: vertical; }
   input:focus, select:focus, textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--info-border);
+    box-shadow: 0 0 0 2px #85B7EB;
   }
   button {
     height: 36px;
     padding: 6px 14px;
     border: 0.5px solid var(--border-strong);
-    border-radius: var(--radius-md);
+    border-radius: 8px;
     background: var(--card-bg);
     color: var(--text);
     font-size: 14px;
@@ -71,45 +79,78 @@
   button:hover { background: #f0eee8; }
   button:active { transform: scale(0.98); }
   .btn-primary {
-    background: var(--info-bg);
-    color: var(--info-text);
-    border: 0.5px solid var(--info-border);
+    background: #0071F3;
+    color: #E6F1FB;
+    border: 0.5px solid #0071F3;
     font-weight: 500;
   }
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card-statement-list { display: flex; flex-direction: column; gap: 12px; }
+  .card-row {
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  .card-row-title { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+  .card-row-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+  .card-row-fields label { font-size: 11px; margin-bottom: 2px; }
+  .totals-summary {
+    border-top: 0.5px solid var(--border-strong);
+    margin-top: 12px;
+    padding-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .totals-summary span { font-size: 14px; font-weight: 500; color: var(--text); display: block; }
   table { width: 100%; font-size: 13px; border-collapse: collapse; table-layout: fixed; }
   th { text-align: left; padding: 6px 4px; border-bottom: 0.5px solid var(--border); font-weight: 500; color: var(--text-secondary); }
   th.num, td.num { text-align: right; }
   td { padding: 6px 4px; }
   tr.row-border td { border-bottom: 0.5px solid var(--border); }
-  tfoot td { border-top: 0.5px solid var(--border-strong); font-weight: 500; padding: 8px 4px; }
   .table-wrap { overflow-x: auto; }
-  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .metric { border-radius: var(--radius-md); padding: 1rem; }
-  .metric.neutral { background: #ece9e1; }
-  .metric.success { background: var(--success-bg); color: var(--success-text); }
-  .metric-label { font-size: 13px; color: var(--text-secondary); }
-  .metric.success .metric-label { color: var(--success-text); }
-  .metric-value { font-size: 24px; font-weight: 500; margin-top: 4px; }
-  .result-header { display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px; }
-  .result-header .name { font-size: 18px; font-weight: 500; }
+  .charge-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: transparent; border: none; padding: 0; cursor: pointer; height: auto;
+  }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .metric { border-radius: 12px; border: 2px solid; padding: 1.25rem 1rem; text-align: center; }
+  .metric-label { font-size: 13px; font-weight: 500; }
+  .metric-value { font-size: 32px; font-weight: 500; margin-top: 6px; }
+  .metric-monthly { background: #E6F1FB; border-color: #0071F3; }
+  .metric-monthly .metric-label { color: #0C447C; }
+  .metric-monthly .metric-value { color: #042C53; }
+  .metric-annual { background: #FAEEDA; border-color: #FAC775; }
+  .metric-annual .metric-label { color: #854F0B; }
+  .metric-annual .metric-value { color: #412402; }
+  .metric-pct { background: #EAF3DE; border-color: #639922; }
+  .metric-pct .metric-label { color: #27500A; }
+  .metric-pct .metric-value { color: #173404; }
+  .result-header { display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px; flex-wrap: wrap; gap: 4px; }
+  .result-header .name { font-size: 18px; font-weight: 500; color: #0458BD; }
   .result-header .date { font-size: 13px; color: var(--text-secondary); }
   .results { display: none; flex-direction: column; gap: 12px; }
   .status { font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; }
-  .icon-btn { display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; }
+  .test-btn { border-style: dashed; border-color: #FAC775; color: #854F0B; }
+  .footer-credit { text-align: center; font-size: 12px; color: var(--text-tertiary); padding-top: 4px; }
 </style>
 </head>
 <body>
 <div class="container">
 
-  <div>
-    <h1>MyPOS savings calculator</h1>
-    <p class="subtitle">Enter the client's current statement figures, pick a matching MyPOS package, and calculate savings.</p>
+  <div class="header-banner">
+    <div>
+      <div class="header-title">myPOS savings calculator</div>
+      <div class="header-subtitle">Quick on-site quote tool</div>
+    </div>
+    <div class="header-badge">Business development manager</div>
   </div>
 
   <div class="card">
     <h3>Setup</h3>
-    <div class="grid2">
+    <div class="setup-grid">
       <div>
         <label for="businessName">Business name</label>
         <input type="text" id="businessName" placeholder="e.g. The Coffee House">
@@ -137,56 +178,64 @@
 
   <div class="card">
     <h3 style="margin-bottom:4px;">Current provider statement</h3>
-    <p class="subtitle" style="margin-bottom:12px;">Enter figures from the client's statement for each card type that applies. Leave rows blank if not used.</p>
-    <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:30%;">Card type</th>
-          <th class="num" style="width:23%;">No. of transactions</th>
-          <th class="num" style="width:23%;">Transaction value £</th>
-          <th class="num" style="width:24%;">Current fees £</th>
-        </tr>
-      </thead>
-      <tbody id="cardTableBody"></tbody>
-      <tfoot>
-        <tr>
-          <td>Total</td>
-          <td class="num" id="totalTx">0</td>
-          <td class="num" id="totalVal">£0.00</td>
-          <td class="num" id="totalFees">£0.00</td>
-        </tr>
-      </tfoot>
-    </table>
+    <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Enter figures from the client's statement for each card type that applies. Leave fields blank if not used.</p>
+    <div id="cardStatementList" class="card-statement-list"></div>
+    <div class="totals-summary">
+      <div>Total tx<span id="totalTx">0</span></div>
+      <div>Total value<span id="totalVal">£0.00</span></div>
+      <div>Total fees<span id="totalFees">£0.00</span></div>
     </div>
   </div>
 
   <div class="card">
-    <h3>Other current charges (monthly, £)</h3>
-    <div class="grid2">
-      <div>
-        <label for="authFee">Authorisation fee</label>
-        <input type="number" id="authFee" value="0" step="0.01">
-      </div>
-      <div>
-        <label for="totalAuthCharges">Total authorisation charges</label>
-        <input type="number" id="totalAuthCharges" value="0" step="0.01">
-      </div>
-      <div>
-        <label for="additionalCharges">Additional charges</label>
-        <input type="number" id="additionalCharges" value="0" step="0.01">
-      </div>
-      <div>
-        <label for="terminalFee">Terminal</label>
-        <input type="number" id="terminalFee" value="0" step="0.01">
-      </div>
-      <div>
-        <label for="pciFee">PCI compliance fees</label>
-        <input type="number" id="pciFee" value="0" step="0.01">
-      </div>
-      <div>
-        <label for="vatFee">VAT</label>
-        <input type="number" id="vatFee" value="0" step="0.01">
+    <button id="chargeTypesToggle" class="charge-toggle">
+      <h3 style="margin:0;">Charge types</h3>
+      <i id="chargeTypesIcon" style="font-size:14px;color:#0458BD;" aria-hidden="true">&#9660;</i>
+    </button>
+    <div id="chargeTypesBody" style="display:none;margin-top:12px;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Enter monthly figures for each charge type. Total authorisation charges = total transactions x authorisation fee.</p>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40%;color:#0071F3;">Charge type</th>
+            <th class="num" style="width:30%;color:#5F5E5A;">Current provider £</th>
+            <th class="num" style="width:30%;color:#0071F3;">MyPOS £</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-border">
+            <td>Authorisation fee (per transaction)</td>
+            <td><input type="number" min="0" step="0.001" id="authFeeCurrent" value="0" style="text-align:right;"></td>
+            <td><input type="number" min="0" step="0.001" id="authFeeMypos" value="0" style="text-align:right;"></td>
+          </tr>
+          <tr class="row-border">
+            <td>Total authorisation charges</td>
+            <td class="num" id="totalAuthChargesCurrent">£0.00</td>
+            <td class="num" id="totalAuthChargesMypos">£0.00</td>
+          </tr>
+          <tr class="row-border">
+            <td>Additional charges</td>
+            <td><input type="number" min="0" step="0.01" id="additionalChargesCurrent" value="0" style="text-align:right;"></td>
+            <td><input type="number" min="0" step="0.01" id="additionalChargesMypos" value="0" style="text-align:right;"></td>
+          </tr>
+          <tr class="row-border">
+            <td>Terminal</td>
+            <td><input type="number" min="0" step="0.01" id="terminalFeeCurrent" value="0" style="text-align:right;"></td>
+            <td><input type="number" min="0" step="0.01" id="terminalFeeMypos" value="0" style="text-align:right;"></td>
+          </tr>
+          <tr class="row-border">
+            <td>PCI compliance fees</td>
+            <td><input type="number" min="0" step="0.01" id="pciFeeCurrent" value="0" style="text-align:right;"></td>
+            <td><input type="number" min="0" step="0.01" id="pciFeeMypos" value="0" style="text-align:right;"></td>
+          </tr>
+          <tr class="row-border">
+            <td>VAT</td>
+            <td><input type="number" min="0" step="0.01" id="vatFeeCurrent" value="0" style="text-align:right;"></td>
+            <td><input type="number" min="0" step="0.01" id="vatFeeMypos" value="0" style="text-align:right;"></td>
+          </tr>
+        </tbody>
+      </table>
       </div>
     </div>
   </div>
@@ -198,10 +247,10 @@
 
   <div class="card">
     <h3 style="margin-bottom:4px;">Save / load client record</h3>
-    <p class="subtitle" style="margin-bottom:12px;">Copy this snapshot text and store it in your notes. Paste it back here later to restore all figures.</p>
+    <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Copy this snapshot text and store it in your notes. Paste it back here later to restore all figures.</p>
     <div style="display:flex; gap:8px; margin-bottom:8px;">
-      <button id="copySnapshotBtn" class="icon-btn">Copy snapshot</button>
-      <button id="loadSnapshotBtn" class="icon-btn">Load snapshot</button>
+      <button id="copySnapshotBtn" style="flex:1;">Copy snapshot</button>
+      <button id="loadSnapshotBtn" style="flex:1;">Load snapshot</button>
     </div>
     <textarea id="snapshotArea" rows="3" placeholder="Snapshot text appears here when copied, or paste a saved snapshot here and press Load"></textarea>
     <p id="snapshotStatus" class="status"></p>
@@ -215,15 +264,15 @@
     </div>
 
     <div class="metrics">
-      <div class="metric neutral">
+      <div class="metric metric-monthly">
         <div class="metric-label">Monthly saving</div>
         <div class="metric-value" id="monthlySaving">£0</div>
       </div>
-      <div class="metric neutral">
+      <div class="metric metric-annual">
         <div class="metric-label">Annual saving</div>
         <div class="metric-value" id="annualSaving">£0</div>
       </div>
-      <div class="metric success">
+      <div class="metric metric-pct">
         <div class="metric-label">Saving %</div>
         <div class="metric-value" id="savingPct">0%</div>
       </div>
@@ -235,8 +284,8 @@
         <thead>
           <tr>
             <th></th>
-            <th class="num" id="currentProviderHeader">Current provider</th>
-            <th class="num">MyPOS</th>
+            <th class="num" id="currentProviderHeader" style="color:#5F5E5A;">Current provider</th>
+            <th class="num" style="color:#0071F3;">MyPOS</th>
           </tr>
         </thead>
         <tbody id="comparisonBody"></tbody>
@@ -259,6 +308,10 @@
 
   </div>
 
+  <button id="testBtn" class="test-btn">Test</button>
+
+  <div class="footer-credit">by halohireph.com</div>
+
 </div>
 
 <script>
@@ -269,8 +322,8 @@ const cardTypes = [
   {key:"mcCredit", label:"Mastercard Credit", rateKey:"consumerCredit"},
   {key:"visaCredit", label:"Visa Credit", rateKey:"consumerCredit"},
   {key:"visaBusiness", label:"Visa Business Debit", rateKey:"visaBusinessDebit"},
-  {key:"mcCorpPurchasing", label:"Mastercard Corporate/Purchasing", rateKey:"visaMcCommercial"},
-  {key:"visaCorpPurchasing", label:"Visa Corporate/Purchasing", rateKey:"visaMcCommercial"},
+  {key:"mcCorpPurchasing", label:"Mastercard Corporate / Purchasing", rateKey:"visaMcCommercial"},
+  {key:"visaCorpPurchasing", label:"Visa Corporate / Purchasing", rateKey:"visaMcCommercial"},
   {key:"amex", label:"Amex", rateKey:"amex"},
 ];
 
@@ -321,22 +374,56 @@ const packages = [
   {code:"UTP-UK-096-3p", consumerDebit:0.58, consumerCredit:0.91, premiumConsumerCredit:2.05, visaMcCommercial:2.05, visaBusinessDebit:1.15, amex:1.90, atvMin:15, atvMax:Infinity, note:"ATV £15+", ma:false},
 ];
 
-const tbody = document.getElementById("cardTableBody");
+const listContainer = document.getElementById("cardStatementList");
 cardTypes.forEach(ct => {
-  const tr = document.createElement("tr");
-  tr.classList.add("row-border");
-  tr.innerHTML = `
-    <td>${ct.label}</td>
-    <td><input type="number" min="0" step="1" data-key="${ct.key}" data-field="tx" style="text-align:right;"></td>
-    <td><input type="number" min="0" step="0.01" data-key="${ct.key}" data-field="val" style="text-align:right;"></td>
-    <td><input type="number" min="0" step="0.01" data-key="${ct.key}" data-field="fee" style="text-align:right;"></td>
+  const row = document.createElement("div");
+  row.className = "card-row";
+  row.innerHTML = `
+    <div class="card-row-title">${ct.label}</div>
+    <div class="card-row-fields">
+      <div>
+        <label>No. of tx</label>
+        <input type="number" min="0" step="1" data-key="${ct.key}" data-field="tx">
+      </div>
+      <div>
+        <label>Value £</label>
+        <input type="number" min="0" step="0.01" data-key="${ct.key}" data-field="val">
+      </div>
+      <div>
+        <label>Fees £</label>
+        <input type="number" min="0" step="0.01" data-key="${ct.key}" data-field="fee">
+      </div>
+    </div>
   `;
-  tbody.appendChild(tr);
+  listContainer.appendChild(row);
 });
 
 const dateField = document.getElementById("visitDate");
 const today = new Date();
 dateField.value = today.toISOString().split("T")[0];
+
+document.getElementById("chargeTypesToggle").addEventListener("click", ()=>{
+  const body = document.getElementById("chargeTypesBody");
+  const icon = document.getElementById("chargeTypesIcon");
+  const isHidden = body.style.display === "none";
+  body.style.display = isHidden ? "block" : "none";
+  icon.innerHTML = isHidden ? "&#9650;" : "&#9660;";
+});
+
+function updateAuthTotals(totalTx){
+  const authCurrent = Number(document.getElementById("authFeeCurrent").value)||0;
+  const authMypos = Number(document.getElementById("authFeeMypos").value)||0;
+  document.getElementById("totalAuthChargesCurrent").textContent = "£" + (totalTx*authCurrent).toFixed(2);
+  document.getElementById("totalAuthChargesMypos").textContent = "£" + (totalTx*authMypos).toFixed(2);
+}
+document.getElementById("authFeeCurrent").addEventListener("input", ()=>{
+  const totalTx = Array.from(document.querySelectorAll('[data-field="tx"]')).reduce((s,i)=>s+(Number(i.value)||0),0);
+  updateAuthTotals(totalTx);
+});
+document.getElementById("authFeeMypos").addEventListener("input", ()=>{
+  const totalTx = Array.from(document.querySelectorAll('[data-field="tx"]')).reduce((s,i)=>s+(Number(i.value)||0),0);
+  updateAuthTotals(totalTx);
+});
 
 function updateTotals(){
   let totalTx=0, totalVal=0, totalFees=0;
@@ -357,8 +444,9 @@ function updateTotals(){
     }
   }
   populatePackages();
+  updateAuthTotals(totalTx);
 }
-document.querySelectorAll('#cardTableBody input').forEach(i=>i.addEventListener('input', updateTotals));
+document.querySelectorAll('#cardStatementList input').forEach(i=>i.addEventListener('input', updateTotals));
 
 function populatePackages(preselect){
   const raw = document.getElementById("atvInput").value.trim();
@@ -409,6 +497,7 @@ function calculate(){
   const visitDateRaw = document.getElementById("visitDate").value;
 
   let totalCurrentFees=0;
+  let totalTx=0;
   let mypopsTotal=0;
   const ratesRows=[];
   cardTypes.forEach(ct=>{
@@ -416,6 +505,7 @@ function calculate(){
     const val = Number(document.querySelector(`[data-key="${ct.key}"][data-field="val"]`).value)||0;
     const fee = Number(document.querySelector(`[data-key="${ct.key}"][data-field="fee"]`).value)||0;
     totalCurrentFees += fee;
+    totalTx += tx;
     if(tx>0 || val>0){
       const rate = pkg[ct.rateKey] || 0;
       const charge = val * rate / 100;
@@ -424,16 +514,25 @@ function calculate(){
     }
   });
 
-  const authFee = Number(document.getElementById("authFee").value)||0;
-  const totalAuthCharges = Number(document.getElementById("totalAuthCharges").value)||0;
-  const additionalCharges = Number(document.getElementById("additionalCharges").value)||0;
-  const terminalFee = Number(document.getElementById("terminalFee").value)||0;
-  const pciFee = Number(document.getElementById("pciFee").value)||0;
-  const vatFee = Number(document.getElementById("vatFee").value)||0;
+  const authFeeCurrent = Number(document.getElementById("authFeeCurrent").value)||0;
+  const authFeeMypos = Number(document.getElementById("authFeeMypos").value)||0;
+  const totalAuthChargesCurrent = totalTx*authFeeCurrent;
+  const totalAuthChargesMypos = totalTx*authFeeMypos;
 
-  const currentOtherTotal = authFee+totalAuthCharges+additionalCharges+terminalFee+pciFee+vatFee;
+  const additionalChargesCurrent = Number(document.getElementById("additionalChargesCurrent").value)||0;
+  const additionalChargesMypos = Number(document.getElementById("additionalChargesMypos").value)||0;
+  const terminalFeeCurrent = Number(document.getElementById("terminalFeeCurrent").value)||0;
+  const terminalFeeMypos = Number(document.getElementById("terminalFeeMypos").value)||0;
+  const pciFeeCurrent = Number(document.getElementById("pciFeeCurrent").value)||0;
+  const pciFeeMypos = Number(document.getElementById("pciFeeMypos").value)||0;
+  const vatFeeCurrent = Number(document.getElementById("vatFeeCurrent").value)||0;
+  const vatFeeMypos = Number(document.getElementById("vatFeeMypos").value)||0;
+
+  const currentOtherTotal = totalAuthChargesCurrent + additionalChargesCurrent + terminalFeeCurrent + pciFeeCurrent + vatFeeCurrent;
+  const myposOtherTotal = totalAuthChargesMypos + additionalChargesMypos + terminalFeeMypos + pciFeeMypos + vatFeeMypos;
+
   const currentTotal = totalCurrentFees + currentOtherTotal;
-  const mypopsGrandTotal = mypopsTotal;
+  const mypopsGrandTotal = mypopsTotal + myposOtherTotal;
 
   const monthlySaving = currentTotal - mypopsGrandTotal;
   const annualSaving = monthlySaving*12;
@@ -455,18 +554,19 @@ function calculate(){
   const compBody = document.getElementById("comparisonBody");
   compBody.innerHTML = "";
   const rows = [
-    ["Card processing fees", totalCurrentFees, mypopsGrandTotal],
-    ["Authorisation fee", authFee, 0],
-    ["Total authorisation charges", totalAuthCharges, 0],
-    ["Additional charges", additionalCharges, 0],
-    ["Terminal", terminalFee, 0],
-    ["PCI compliance fees", pciFee, 0],
-    ["VAT", vatFee, 0],
+    ["Card processing fees", totalCurrentFees, mypopsGrandTotal-myposOtherTotal],
+    ["Total authorisation charges", totalAuthChargesCurrent, totalAuthChargesMypos],
+    ["Additional charges", additionalChargesCurrent, additionalChargesMypos],
+    ["Terminal", terminalFeeCurrent, terminalFeeMypos],
+    ["PCI compliance fees", pciFeeCurrent, pciFeeMypos],
+    ["VAT", vatFeeCurrent, vatFeeMypos],
     ["Total monthly cost", currentTotal, mypopsGrandTotal],
   ];
   rows.forEach((r,idx)=>{
-    const tr = document.createElement("tr");
     const isTotal = idx===rows.length-1;
+    const isZero = Math.abs(r[1])<0.005 && Math.abs(r[2])<0.005;
+    if(isZero && !isTotal) return;
+    const tr = document.createElement("tr");
     if(!isTotal) tr.classList.add("row-border");
     else { tr.style.borderTop = "0.5px solid var(--border-strong)"; tr.style.fontWeight="500"; }
     tr.innerHTML = `<td>${r[0]}</td><td class="num">£${r[1].toFixed(2)}</td><td class="num">£${r[2].toFixed(2)}</td>`;
@@ -488,7 +588,7 @@ function calculate(){
 document.getElementById("calcBtn").addEventListener("click", calculate);
 document.getElementById("resetBtn").addEventListener("click", ()=>{
   document.querySelectorAll('input').forEach(i=>{
-    if(i.type==='number') i.value = i.id.includes('Fee') || i.id.includes('Charges') ? '0' : '';
+    if(i.type==='number') i.value = (i.id.includes('Fee') || i.id.includes('Charges')) ? '0' : '';
     else if(i.type==='date') { const t=new Date(); i.value=t.toISOString().split("T")[0]; }
     else i.value='';
   });
@@ -499,9 +599,46 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
   updateTotals();
 });
 
+document.getElementById("testBtn").addEventListener("click", ()=>{
+  document.getElementById("businessName").value = "Test Business";
+  document.getElementById("providerName").value = "Current Provider";
+
+  const sampleData = {
+    visaDebit: {tx:5398, val:50594.68, fee:237.79},
+    mcDebit: {tx:1665, val:14821.43, fee:69.66},
+    mcBusiness: {tx:51, val:776.52, fee:19.41},
+    mcCredit: {tx:126, val:1324.77, fee:15.75},
+    visaCredit: {tx:60, val:524.36, fee:6.24},
+    visaBusiness: {tx:17, val:184.87, fee:4.62},
+    mcCorpPurchasing: {tx:6, val:88.16, fee:2.20},
+    visaCorpPurchasing: {tx:2, val:11.90, fee:0.30},
+    amex: {tx:0, val:0, fee:0}
+  };
+
+  cardTypes.forEach(ct=>{
+    const d = sampleData[ct.key] || {tx:0, val:0, fee:0};
+    document.querySelector(`[data-key="${ct.key}"][data-field="tx"]`).value = d.tx || "";
+    document.querySelector(`[data-key="${ct.key}"][data-field="val"]`).value = d.val || "";
+    document.querySelector(`[data-key="${ct.key}"][data-field="fee"]`).value = d.fee || "";
+  });
+
+  document.getElementById("authFeeCurrent").value = "0";
+  document.getElementById("authFeeMypos").value = "0";
+  document.getElementById("additionalChargesCurrent").value = "0";
+  document.getElementById("additionalChargesMypos").value = "0";
+  document.getElementById("terminalFeeCurrent").value = "0";
+  document.getElementById("terminalFeeMypos").value = "0";
+  document.getElementById("pciFeeCurrent").value = "0";
+  document.getElementById("pciFeeMypos").value = "0";
+  document.getElementById("vatFeeCurrent").value = "0";
+  document.getElementById("vatFeeMypos").value = "0";
+
+  updateTotals();
+});
+
 function buildSnapshot(){
   const data = {
-    v: 1,
+    v: 2,
     business: document.getElementById("businessName").value,
     date: document.getElementById("visitDate").value,
     provider: document.getElementById("providerName").value,
@@ -509,12 +646,16 @@ function buildSnapshot(){
     pkg: document.getElementById("packageSelect").value,
     cards: {},
     charges: {
-      auth: document.getElementById("authFee").value,
-      authTotal: document.getElementById("totalAuthCharges").value,
-      additional: document.getElementById("additionalCharges").value,
-      terminal: document.getElementById("terminalFee").value,
-      pci: document.getElementById("pciFee").value,
-      vat: document.getElementById("vatFee").value
+      authCurrent: document.getElementById("authFeeCurrent").value,
+      authMypos: document.getElementById("authFeeMypos").value,
+      additionalCurrent: document.getElementById("additionalChargesCurrent").value,
+      additionalMypos: document.getElementById("additionalChargesMypos").value,
+      terminalCurrent: document.getElementById("terminalFeeCurrent").value,
+      terminalMypos: document.getElementById("terminalFeeMypos").value,
+      pciCurrent: document.getElementById("pciFeeCurrent").value,
+      pciMypos: document.getElementById("pciFeeMypos").value,
+      vatCurrent: document.getElementById("vatFeeCurrent").value,
+      vatMypos: document.getElementById("vatFeeMypos").value
     }
   };
   cardTypes.forEach(ct=>{
@@ -556,12 +697,19 @@ document.getElementById("loadSnapshotBtn").addEventListener("click", ()=>{
   document.getElementById("businessName").value = data.business || "";
   document.getElementById("visitDate").value = data.date || "";
   document.getElementById("providerName").value = data.provider || "";
-  document.getElementById("authFee").value = data.charges?.auth ?? "0";
-  document.getElementById("totalAuthCharges").value = data.charges?.authTotal ?? "0";
-  document.getElementById("additionalCharges").value = data.charges?.additional ?? "0";
-  document.getElementById("terminalFee").value = data.charges?.terminal ?? "0";
-  document.getElementById("pciFee").value = data.charges?.pci ?? "0";
-  document.getElementById("vatFee").value = data.charges?.vat ?? "0";
+
+  if(data.v === 2){
+    document.getElementById("authFeeCurrent").value = data.charges?.authCurrent ?? "0";
+    document.getElementById("authFeeMypos").value = data.charges?.authMypos ?? "0";
+    document.getElementById("additionalChargesCurrent").value = data.charges?.additionalCurrent ?? "0";
+    document.getElementById("additionalChargesMypos").value = data.charges?.additionalMypos ?? "0";
+    document.getElementById("terminalFeeCurrent").value = data.charges?.terminalCurrent ?? "0";
+    document.getElementById("terminalFeeMypos").value = data.charges?.terminalMypos ?? "0";
+    document.getElementById("pciFeeCurrent").value = data.charges?.pciCurrent ?? "0";
+    document.getElementById("pciFeeMypos").value = data.charges?.pciMypos ?? "0";
+    document.getElementById("vatFeeCurrent").value = data.charges?.vatCurrent ?? "0";
+    document.getElementById("vatFeeMypos").value = data.charges?.vatMypos ?? "0";
+  }
 
   cardTypes.forEach(ct=>{
     const c = data.cards?.[ct.key] || {};
